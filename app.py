@@ -265,7 +265,7 @@ def authenticate():
         
         # Build Collection Record
         query = {
-            'username'  :   statusData['username'],
+            'email'  :   statusData['email'],
             'password'  :   statusData['password']
         }
 
