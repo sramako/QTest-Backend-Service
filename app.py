@@ -242,6 +242,69 @@ def metadata():
 
         return json.dumps(data)
 
+@app.route('/authenticate', methods = ['POST'])
+def authenticate():
+    data = json.loads(request.data)
+    email = data['email']
+    db_col = db["Users"]
+    res = db_col.find(
+        { 'email' : email },
+        { 'email' : 1 }
+    )
+
+    # Login
+    if res.count()>0:
+        keys = ['email', 'password']
+
+        statusData = dict()
+        for key in keys:
+            if key in data:
+                statusData[key] = data[key]
+            else:
+                return "Invalid Payload"
+        
+        # Build Collection Record
+        query = {
+            'username'  :   statusData['username'],
+            'password'  :   statusData['password']
+        }
+
+        # Check Test State
+        db_col = db["Users"]
+        values = ["googleId", "imageUrl", "email", "name", "givenName", "familyName", "password"]
+        returnValues = dict()
+        returnValues['_id'] = 0
+        for val in values:
+            returnValues[val] = 1
+        res = db_col.find(
+            query,
+            returnValues
+        )
+        if res.count==0"
+            json.dumps({"state":"error"})
+
+        data = res.next()
+        returnData = dict()
+        for val in values:
+            if val!="password":
+                returnData[val] = data[val]
+
+        return json.dumps(returnData)
+
+    else:
+        keys = ["googleId", "imageUrl", "email", "name", "givenName", "familyName", "password"]
+
+        statusData = dict()
+        for key in keys:
+            statusData[key] = data[key]
+
+        db_col.insert_one(
+            statusData
+        )
+
+        return json.dumps({"state":"success"})
+
+
 @app.route('/health', methods = ['GET'])
 def health():
     return "Ok"
