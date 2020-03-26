@@ -280,7 +280,7 @@ def authenticate():
             query,
             returnValues
         )
-        if res.count==0"
+        if res.count==0:
             json.dumps({"state":"error"})
 
         data = res.next()
